@@ -8,6 +8,39 @@ export class BrrrApiError extends Error {
   }
 }
 
+const PRIVATE_IP_PATTERNS = [
+  /^127\./,
+  /^10\./,
+  /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
+  /^192\.168\./,
+  /^169\.254\./,
+  /^0\./,
+  /^224\./,
+  /^240\./,
+];
+
+const BLOCKED_HOSTNAMES = [
+  "localhost",
+  "metadata.google.internal",
+  "metadata.internal",
+];
+
+function isPrivateUrl(url: URL): boolean {
+  const hostname = url.hostname.toLowerCase();
+  if (BLOCKED_HOSTNAMES.includes(hostname)) {
+    return true;
+  }
+  for (const pattern of PRIVATE_IP_PATTERNS) {
+    if (pattern.test(hostname)) {
+      return true;
+    }
+  }
+  if (hostname === "::1" || hostname === "[::1]" || hostname === "fc00::" || hostname === "[fc00::]" || hostname === "fd00::" || hostname === "[fd00::]") {
+    return true;
+  }
+  return false;
+}
+
 export class BrrrClient {
   private secret: string;
   private baseUrl: string;
@@ -24,13 +57,32 @@ export class BrrrClient {
     return `${this.baseUrl}${this.secret}`;
   }
 
+  private validateUrl(url: URL): void {
+    if (url.protocol !== "https:") {
+      throw new BrrrApiError("SSRF protection: Only HTTPS URLs are allowed");
+    }
+    if (isPrivateUrl(url)) {
+      throw new BrrrApiError("SSRF protection: Private/internal URLs are not allowed");
+    }
+  }
+
   async sendNotification(_mapping: MappingConfig, payload: BrrrPayload): Promise<void> {
     const url = this.buildUrl();
-    
+
+    try {
+      const parsedUrl = new URL(url);
+      this.validateUrl(parsedUrl);
+    } catch (e) {
+      if (e instanceof BrrrApiError) {
+        throw e;
+      }
+      throw new BrrrApiError(`Invalid URL: ${url}`);
+    }
+
     const startTime = Date.now();
-    
-    logger.debug("Sending to Brrr", { url, payload });
-    
+
+    logger.debug("Sending to Brrr", { payload });
+
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -41,7 +93,7 @@ export class BrrrClient {
       });
 
       const duration = Date.now() - startTime;
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         logger.error("Brrr API error", {

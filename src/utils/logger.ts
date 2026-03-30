@@ -74,12 +74,10 @@ export class Logger {
     }
   }
 
-  logRequest(requestId: string, mappingName: string, payload: unknown, status: string, durationMs?: number, error?: string): void {
-    const summary = payload ? JSON.stringify(payload).substring(0, 200) : undefined;
+  logRequest(requestId: string, mappingName: string, _payload: unknown, status: string, durationMs?: number, error?: string): void {
     this.info("HTTP request processed", {
       request_id: requestId,
       mapping_name: mappingName,
-      payload_summary: summary,
       status,
       duration_ms: durationMs,
       error,
