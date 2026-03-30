@@ -12,11 +12,12 @@ COPY deno.json ./
 COPY src/ ./src/
 COPY config/ ./config/
 
+RUN deno cache src/main.ts
+
 USER appuser
 
 EXPOSE 8080
 
-ENV PORT=8080
 ENV MAPPINGS_FILE=/app/config/mappings.yaml
 ENV DENO_DIR=/app/.deno
 
