@@ -18,7 +18,7 @@ app.notFound((c: Context) => {
   return c.json({ error: "Not found", path: c.req.path }, 404);
 });
 
-const port = parseInt(Deno.env.get("PORT") || "8080");
+const port = 8080;
 
 logger.info("Starting webhook middleware", { status: "starting", port: port });
 
