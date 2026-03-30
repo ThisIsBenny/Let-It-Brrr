@@ -1,7 +1,8 @@
 import type { Context } from "@hono/hono";
 import { getConfigLoader } from "../config/loader.ts";
 import { baseTransformer } from "../transformers/base.ts";
-import { BrrrClient } from "../services/brrr.ts";
+import { BrrrService } from "../services/brrr.ts";
+import { config } from "../config/config.ts";
 import { logger } from "../utils/logger.ts";
 import { BrrrApiError } from "../errors/index.ts";
 
@@ -32,10 +33,10 @@ export async function handleWebhook(c: Context, mappingId: string) {
     throw new BrrrApiError("Mapping not found", 404);
   }
 
-  const brrrClient = new BrrrClient();
+  const brrrService = BrrrService.get(config.brrrWebhookUrl, config.brrrSecret);
   const transformation = baseTransformer.transform(body, mapping);
 
-  await brrrClient.sendNotification(mapping, transformation.payload);
+  await brrrService.sendNotification(mapping, transformation.payload);
 
   const duration = Date.now() - startTime;
   logger.logRequest(requestId, mappingId, body, "success", duration);

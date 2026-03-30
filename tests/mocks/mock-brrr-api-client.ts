@@ -1,0 +1,42 @@
+import type { BrrrPayload } from "../../src/types/index.ts";
+import type { IBrrrApiClient, BrrrResponse } from "../../src/services/brrr-api-client.ts";
+
+export class MockBrrrApiClient implements IBrrrApiClient {
+  private shouldFail = false;
+  private failureMessage = "Mock error";
+  private lastPayload: BrrrPayload | null = null;
+
+  static success(): MockBrrrApiClient {
+    return new MockBrrrApiClient();
+  }
+
+  static failure(message = "Mock error"): MockBrrrApiClient {
+    return new MockBrrrApiClient(true, message);
+  }
+
+  private constructor(shouldFail = false, failureMessage = "Mock error") {
+    this.shouldFail = shouldFail;
+    this.failureMessage = failureMessage;
+  }
+
+  async post(payload: BrrrPayload): Promise<BrrrResponse> {
+    this.lastPayload = payload;
+
+    if (this.shouldFail) {
+      throw new Error(this.failureMessage);
+    }
+
+    return {
+      success: true,
+      id: `mock-${Date.now()}`,
+    };
+  }
+
+  getLastPayload(): BrrrPayload | null {
+    return this.lastPayload;
+  }
+
+  reset(): void {
+    this.lastPayload = null;
+  }
+}
