@@ -17,3 +17,19 @@ mappings:
         target_field: "title"
     default_values:
       title: "Beszel"
+  uptimekuma:
+    brrr_fields:
+      - field_expression: "heartbeat.msg"
+        target_field: "message"
+      - field_expression: "monitor.name"
+        target_field: "subtitle"
+    default_values:
+      title: "Uptime Kuma"
+  proxmox:
+    brrr_fields:
+      - field_expression: "message"
+        target_field: "message"
+      - field_expression: "title"
+        target_field: "subtitle"
+    default_values:
+      title: "Proxmox"
