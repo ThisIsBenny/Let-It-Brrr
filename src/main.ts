@@ -22,4 +22,4 @@ const port = parseInt(Deno.env.get("PORT") || "8080");
 
 logger.info("Starting webhook middleware", { status: "starting", port: port });
 
-Deno.serve(app.fetch);
+Deno.serve({ port }, app.fetch);
