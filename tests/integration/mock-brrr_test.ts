@@ -1,6 +1,6 @@
 import { assertEquals, assertExists } from "@std/assert";
 import { ConfigLoader } from "../../src/config/loader.ts";
-import { FluxCDTransformer } from "../../src/transformers/fluxcd.ts";
+import { baseTransformer } from "../../src/transformers/base.ts";
 import type { MappingConfig } from "../../src/types/index.ts";
 
 Deno.test("Integration - Load config and transform payload", async () => {
@@ -10,13 +10,12 @@ Deno.test("Integration - Load config and transform payload", async () => {
   const mapping = loader.getMapping("fluxcd-generic");
   assertExists(mapping);
   
-  const transformer = new FluxCDTransformer();
   const payload = {
     message: "Deployment failed",
     involvedObject: { kind: "Deployment", name: "my-app" }
   };
   
-  const result = transformer.transform(payload, mapping as MappingConfig);
+  const result = baseTransformer.transform(payload, mapping as MappingConfig);
   
   assertEquals(result.payload.message, "Deployment failed");
   assertEquals(result.payload.title, "FluxCD - Deployment");
@@ -43,7 +42,6 @@ Deno.test("Integration - Real FluxCD webhook payload transformation", async () =
   await loader.load();
   
   const mapping = loader.getMapping("fluxcd-generic") as MappingConfig;
-  const transformer = new FluxCDTransformer();
   
   const realFluxCDPayload = {
     "message": "Deployment 'my-app' is ready",
@@ -58,7 +56,7 @@ Deno.test("Integration - Real FluxCD webhook payload transformation", async () =
     "reportingInstance": "deployment-controller-abc123"
   };
   
-  const result = transformer.transform(realFluxCDPayload, mapping);
+  const result = baseTransformer.transform(realFluxCDPayload, mapping);
   
   assertEquals(result.payload.message, "Deployment 'my-app' is ready");
   assertEquals(result.payload.title, "FluxCD - Deployment");
@@ -84,16 +82,13 @@ Deno.test("Integration - Default values applied when source missing", async () =
   await loader.load();
   
   const mapping = loader.getMapping("fluxcd-generic") as MappingConfig;
-  const transformer = new FluxCDTransformer();
   
-  // Payload with minimal data
   const minimalPayload = {
     message: "Test"
   };
   
-  const result = transformer.transform(minimalPayload, mapping);
+  const result = baseTransformer.transform(minimalPayload, mapping);
   
-  // title should have static prefix even with missing field
   assertExists(result.payload.title);
 });
 
@@ -102,15 +97,13 @@ Deno.test("Integration - Empty message field skipped", async () => {
   await loader.load();
   
   const mapping = loader.getMapping("fluxcd-generic") as MappingConfig;
-  const transformer = new FluxCDTransformer();
   
   const payloadWithEmptyMessage = {
     message: "",
     involvedObject: { kind: "Deployment" }
   };
   
-  const result = transformer.transform(payloadWithEmptyMessage, mapping);
+  const result = baseTransformer.transform(payloadWithEmptyMessage, mapping);
   
-  // Empty string is skipped (not passed through), so message is undefined
   assertEquals(result.payload.message, undefined);
 });

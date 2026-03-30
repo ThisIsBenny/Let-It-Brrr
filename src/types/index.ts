@@ -62,5 +62,5 @@ export interface ErrorResponse {
 
 export interface TransformationResult {
   payload: BrrrPayload;
-  mappingName: string;
+  mappingName?: string;
 }

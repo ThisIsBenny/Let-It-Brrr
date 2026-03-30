@@ -1,5 +1,6 @@
 import { assertEquals, assertInstanceOf } from "@std/assert";
-import { BrrrClient, BrrrApiError } from "../../../src/services/brrr.ts";
+import { BrrrClient } from "../../../src/services/brrr.ts";
+import { BrrrApiError } from "../../../src/errors/index.ts";
 import type { MappingConfig } from "../../../src/types/index.ts";
 
 const createMapping = (): MappingConfig => ({ brrr_fields: [] });

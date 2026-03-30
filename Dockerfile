@@ -1,6 +1,10 @@
 FROM denoland/deno:2.7.9
 
+ARG VERSION=0.0.0
+
 WORKDIR /app
+
+RUN echo $VERSION > /app/VERSION
 
 RUN groupadd --system --gid 1000 appgroup && \
     useradd --system --uid 1000 --gid 1000 appuser

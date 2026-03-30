@@ -135,8 +135,13 @@ Health check endpoint.
 
 **Response:**
 ```json
-{ "status": "ok" }
+{ "status": "ok", "mappings_count": 2, "version": "1.0.0" }
 ```
+
+**Fields:**
+- `status` - Always "ok" when healthy
+- `mappings_count` - Number of configured mappings
+- `version` - Application version (from git tag or "0.0.0" if not available)
 
 #### `POST /webhook/:mappingId`
 

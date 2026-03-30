@@ -4,15 +4,21 @@ export interface Transformer {
   transform(payload: unknown, mapping: MappingConfig): TransformationResult;
 }
 
-export abstract class BaseTransformer implements Transformer {
-  abstract transform(payload: unknown, mapping: MappingConfig): TransformationResult;
+export class BaseTransformer implements Transformer {
+  transform(payload: unknown, mapping: MappingConfig): TransformationResult {
+    const brrrPayload = this.buildBrrrPayload(payload, mapping);
+
+    return {
+      payload: brrrPayload,
+    };
+  }
 
   protected getValueByPath(obj: unknown, path: string): unknown {
     if (!obj || typeof obj !== "object") return undefined;
-    
+
     const parts = path.split(".");
     let current: unknown = obj;
-    
+
     for (const part of parts) {
       if (current && typeof current === "object" && part in current) {
         current = (current as Record<string, unknown>)[part];
@@ -20,14 +26,13 @@ export abstract class BaseTransformer implements Transformer {
         return undefined;
       }
     }
-    
+
     return current;
   }
 
   protected interpolateTemplate(template: string, payload: unknown): string {
     return template.replace(/\{\{([^}]+)\}\}/g, (_, path) => {
       const value = this.getValueByPath(payload, path.trim());
-      // Treat null/undefined/empty as no value
       if (value === null || value === undefined || value === "") {
         return "";
       }
@@ -43,25 +48,20 @@ export abstract class BaseTransformer implements Transformer {
 
     for (const fieldMapping of mapping.brrr_fields) {
       const { field_expression, target_field } = fieldMapping;
-      
-      // Check if it's a template (contains {{...}})
+
       if (field_expression.includes("{{") && field_expression.includes("}}")) {
         const value = this.interpolateTemplate(field_expression, sourcePayload);
-        // Only use template if it has actual substituted content
-        // "FluxCD - " (static text only) is treated as empty
         const hasContent = value.replace(/^[\s-]+/, "").length > 0;
         if (hasContent) {
           (result as Record<string, unknown>)[target_field] = value;
         }
       } else {
-        // Direct field mapping
         const value = this.getValueByPath(sourcePayload, field_expression);
-        // Handle null, undefined, and empty string
         if (value === null || value === undefined) {
-          continue; // Skip, let default_values handle it
+          continue;
         }
         const processedValue = typeof value === "string" ? value : String(value);
-        
+
         if (processedValue) {
           (result as Record<string, unknown>)[target_field] = processedValue;
         }
@@ -79,3 +79,5 @@ export abstract class BaseTransformer implements Transformer {
     return result;
   }
 }
+
+export const baseTransformer = new BaseTransformer();

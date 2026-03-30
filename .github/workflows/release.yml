@@ -102,3 +102,5 @@ jobs:
           tags: |
             ${{ steps.registry.outputs.prefix }}:${{ steps.tag.outputs.tag }}
             ${{ steps.registry.outputs.prefix }}:latest
+          build-args: |
+            VERSION=${{ steps.tag.outputs.tag }}

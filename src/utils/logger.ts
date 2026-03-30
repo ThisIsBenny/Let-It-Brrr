@@ -1,3 +1,5 @@
+import { config } from "../config/config.ts";
+
 export interface LogEntry {
   request_id?: string;
   timestamp: string;
@@ -16,7 +18,7 @@ export class Logger {
   private logLevel: string;
 
   constructor(logLevel?: string) {
-    this.logLevel = logLevel || Deno.env.get("LOG_LEVEL") || "info";
+    this.logLevel = logLevel || config.logLevel;
   }
 
   private shouldLog(level: string): boolean {

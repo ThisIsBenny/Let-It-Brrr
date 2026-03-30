@@ -1,41 +1,20 @@
 import type { BrrrPayload, MappingConfig } from "../types/index.ts";
 import { logger } from "../utils/logger.ts";
-
-export class BrrrApiError extends Error {
-  constructor(message: string, public statusCode?: number) {
-    super(message);
-    this.name = "BrrrApiError";
-  }
-}
-
-const PRIVATE_IP_PATTERNS = [
-  /^127\./,
-  /^10\./,
-  /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
-  /^192\.168\./,
-  /^169\.254\./,
-  /^0\./,
-  /^224\./,
-  /^240\./,
-];
-
-const BLOCKED_HOSTNAMES = [
-  "localhost",
-  "metadata.google.internal",
-  "metadata.internal",
-];
+import { config } from "../config/config.ts";
+import { BrrrApiError, SSRFError } from "../errors/index.ts";
+import { validateBrrrPayload } from "../validators/brrr.ts";
 
 function isPrivateUrl(url: URL): boolean {
   const hostname = url.hostname.toLowerCase();
-  if (BLOCKED_HOSTNAMES.includes(hostname)) {
+  if (config.blockedHostnames.includes(hostname)) {
     return true;
   }
-  for (const pattern of PRIVATE_IP_PATTERNS) {
+  for (const pattern of config.privateIpPatterns) {
     if (pattern.test(hostname)) {
       return true;
     }
   }
-  if (hostname === "::1" || hostname === "[::1]" || hostname === "fc00::" || hostname === "[fc00::]" || hostname === "fd00::" || hostname === "[fd00::]") {
+  if (config.blockedIpv6Hostnames.includes(hostname)) {
     return true;
   }
   return false;
@@ -46,10 +25,10 @@ export class BrrrClient {
   private baseUrl: string;
 
   constructor(secret?: string, baseUrl?: string) {
-    this.secret = secret || Deno.env.get("BRRR_SECRET") || "";
-    this.baseUrl = baseUrl || Deno.env.get("BRRR_WEBHOOK_URL") || "https://api.brrr.now/v1/";
+    this.secret = secret || config.brrrSecret;
+    this.baseUrl = baseUrl || config.brrrWebhookUrl;
     if (!this.secret) {
-      throw new Error("BRRR_SECRET environment variable is required");
+      throw new BrrrApiError("BRRR_SECRET environment variable is required");
     }
   }
 
@@ -59,14 +38,20 @@ export class BrrrClient {
 
   private validateUrl(url: URL): void {
     if (url.protocol !== "https:") {
-      throw new BrrrApiError("SSRF protection: Only HTTPS URLs are allowed");
+      throw new SSRFError("SSRF protection: Only HTTPS URLs are allowed");
     }
     if (isPrivateUrl(url)) {
-      throw new BrrrApiError("SSRF protection: Private/internal URLs are not allowed");
+      throw new SSRFError("SSRF protection: Private/internal URLs are not allowed");
     }
   }
 
   async sendNotification(_mapping: MappingConfig, payload: BrrrPayload): Promise<void> {
+    const validationResult = validateBrrrPayload(payload as Record<string, unknown>);
+
+    for (const warning of validationResult.warnings) {
+      logger.warn(warning);
+    }
+
     const url = this.buildUrl();
 
     try {
@@ -81,7 +66,7 @@ export class BrrrClient {
 
     const startTime = Date.now();
 
-    logger.debug("Sending to Brrr", { payload });
+    logger.debug("Sending to Brrr", { payload: validationResult.sanitizedPayload });
 
     try {
       const response = await fetch(url, {
@@ -89,7 +74,7 @@ export class BrrrClient {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(validationResult.sanitizedPayload),
       });
 
       const duration = Date.now() - startTime;

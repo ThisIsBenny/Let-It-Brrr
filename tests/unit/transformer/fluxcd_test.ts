@@ -1,10 +1,8 @@
 import { assertEquals } from "@std/assert";
-import { FluxCDTransformer } from "../../../src/transformers/fluxcd.ts";
+import { baseTransformer } from "../../../src/transformers/base.ts";
 import type { MappingConfig } from "../../../src/types/index.ts";
 
-Deno.test("FluxCDTransformer - direct field mapping", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - direct field mapping", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "message", target_field: "message" },
@@ -12,14 +10,12 @@ Deno.test("FluxCDTransformer - direct field mapping", () => {
   };
 
   const payload = { message: "Test message" };
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.message, "Test message");
 });
 
-Deno.test("FluxCDTransformer - nested field mapping", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - nested field mapping", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "involvedObject.name", target_field: "subtitle" },
@@ -27,14 +23,12 @@ Deno.test("FluxCDTransformer - nested field mapping", () => {
   };
 
   const payload = { involvedObject: { name: "my-app" } };
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.subtitle, "my-app");
 });
 
-Deno.test("FluxCDTransformer - template interpolation", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - template interpolation", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
@@ -42,14 +36,12 @@ Deno.test("FluxCDTransformer - template interpolation", () => {
   };
 
   const payload = { involvedObject: { kind: "Deployment" } };
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.title, "FluxCD - Deployment");
 });
 
-Deno.test("FluxCDTransformer - template with multiple fields", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - template with multiple fields", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "{{reportingController}} - {{involvedObject.kind}}", target_field: "title" },
@@ -60,14 +52,12 @@ Deno.test("FluxCDTransformer - template with multiple fields", () => {
     reportingController: "deployment-controller",
     involvedObject: { kind: "Deployment" }
   };
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.title, "deployment-controller - Deployment");
 });
 
-Deno.test("FluxCDTransformer - default values when missing - template has static prefix", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - default values when missing - template has static prefix", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "message", target_field: "message" },
@@ -79,16 +69,13 @@ Deno.test("FluxCDTransformer - default values when missing - template has static
   };
 
   const payload = { message: "Test" };
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.message, "Test");
-  // Template with static prefix "FluxCD - " keeps that even if interpolated part is empty
   assertEquals(result.payload.title, "FluxCD - ");
 });
 
-Deno.test("FluxCDTransformer - default values NOT used when field exists", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - default values NOT used when field exists", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
@@ -99,14 +86,12 @@ Deno.test("FluxCDTransformer - default values NOT used when field exists", () =>
   };
 
   const payload = { involvedObject: { kind: "Kustomization" } };
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.title, "FluxCD - Kustomization");
 });
 
-Deno.test("FluxCDTransformer - multiple mappings", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - multiple mappings", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "message", target_field: "message" },
@@ -119,16 +104,14 @@ Deno.test("FluxCDTransformer - multiple mappings", () => {
     message: "Deployment failed",
     involvedObject: { kind: "Deployment", name: "my-app" }
   };
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.message, "Deployment failed");
   assertEquals(result.payload.title, "FluxCD - Deployment");
   assertEquals(result.payload.subtitle, "my-app");
 });
 
-Deno.test("FluxCDTransformer - empty template value becomes empty string", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - empty template value becomes empty string", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "FluxCD - {{missing.field}}", target_field: "title" },
@@ -136,14 +119,12 @@ Deno.test("FluxCDTransformer - empty template value becomes empty string", () =>
   };
 
   const payload = {};
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.title, "FluxCD - ");
 });
 
-Deno.test("FluxCDTransformer - missing nested field returns undefined", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - missing nested field returns undefined", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "involvedObject.name", target_field: "subtitle" },
@@ -151,14 +132,12 @@ Deno.test("FluxCDTransformer - missing nested field returns undefined", () => {
   };
 
   const payload = { involvedObject: {} };
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.subtitle, undefined);
 });
 
-Deno.test("FluxCDTransformer - null value skipped, can use default", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - null value skipped, can use default", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "message", target_field: "message" },
@@ -169,15 +148,12 @@ Deno.test("FluxCDTransformer - null value skipped, can use default", () => {
   };
 
   const payload = { message: null };
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
-  // Null is skipped, so default should be used
   assertEquals(result.payload.message, "Default message");
 });
 
-Deno.test("FluxCDTransformer - number converted to string", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - number converted to string", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "count", target_field: "message" },
@@ -185,14 +161,12 @@ Deno.test("FluxCDTransformer - number converted to string", () => {
   };
 
   const payload = { count: 42 };
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.message, "42");
 });
 
-Deno.test("FluxCDTransformer - boolean converted to string", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - boolean converted to string", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "active", target_field: "message" },
@@ -200,14 +174,12 @@ Deno.test("FluxCDTransformer - boolean converted to string", () => {
   };
 
   const payload = { active: true };
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.message, "true");
 });
 
-Deno.test("FluxCDTransformer - empty payload", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - empty payload", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "message", target_field: "message" },
@@ -218,14 +190,12 @@ Deno.test("FluxCDTransformer - empty payload", () => {
   };
 
   const payload = {};
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.message, "Default message");
 });
 
-Deno.test("FluxCDTransformer - deep nested path", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - deep nested path", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "metadata.labels.app", target_field: "message" },
@@ -239,14 +209,12 @@ Deno.test("FluxCDTransformer - deep nested path", () => {
       } 
     } 
   };
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.message, "my-app");
 });
 
-Deno.test("FluxCDTransformer - deep nested path with missing intermediate", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - deep nested path with missing intermediate", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "metadata.labels.app", target_field: "message" },
@@ -254,27 +222,12 @@ Deno.test("FluxCDTransformer - deep nested path with missing intermediate", () =
   };
 
   const payload = { metadata: {} };
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.message, undefined);
 });
 
-Deno.test("FluxCDTransformer - result includes mappingName", () => {
-  const transformer = new FluxCDTransformer();
-  
-  const mapping: MappingConfig = {
-    brrr_fields: [],
-  };
-
-  const payload = {};
-  const result = transformer.transform(payload, mapping);
-
-  assertEquals(result.mappingName, "fluxcd-generic");
-});
-
-Deno.test("FluxCDTransformer - full real-world payload", () => {
-  const transformer = new FluxCDTransformer();
-  
+Deno.test("BaseTransformer - full real-world payload", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "message", target_field: "message" },
@@ -297,7 +250,7 @@ Deno.test("FluxCDTransformer - full real-world payload", () => {
     reportingController: "kustomize-controller"
   };
 
-  const result = transformer.transform(payload, mapping);
+  const result = baseTransformer.transform(payload, mapping);
 
   assertEquals(result.payload.message, "Deployment failed");
   assertEquals(result.payload.title, "FluxCD - Kustomization");
