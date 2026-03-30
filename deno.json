@@ -1,8 +1,8 @@
 {
   "version": "2",
   "tasks": {
-    "dev": "deno run --watch --allow-net=api.brrr.now --allow-read=config/ --allow-env=LOG_LEVEL,PORT,BRRR_SECRET,BRRR_WEBHOOK_URL,MAPPINGS_FILE src/main.ts",
-    "start": "deno run --allow-net=api.brrr.now --allow-read=config/ --allow-env=LOG_LEVEL,PORT,BRRR_SECRET,BRRR_WEBHOOK_URL,MAPPINGS_FILE src/main.ts",
+    "dev": "deno run --watch --allow-net=0.0.0.0:8000,api.brrr.now --allow-read=config/ --allow-env=LOG_LEVEL,PORT,BRRR_SECRET,BRRR_WEBHOOK_URL,MAPPINGS_FILE src/main.ts",
+    "start": "deno run --allow-net=0.0.0.0:8000,api.brrr.now --allow-read=config/ --allow-env=LOG_LEVEL,PORT,BRRR_SECRET,BRRR_WEBHOOK_URL,MAPPINGS_FILE src/main.ts",
     "test": "deno test --allow-read --allow-net=api.brrr.now,127.0.0.1 --allow-env=LOG_LEVEL,PORT,BRRR_SECRET,BRRR_WEBHOOK_URL,MAPPINGS_FILE",
     "test:coverage": "deno test --coverage --allow-read --allow-net=api.brrr.now,127.0.0.1 --allow-env=LOG_LEVEL,PORT,BRRR_SECRET,BRRR_WEBHOOK_URL,MAPPINGS_FILE",
     "lint": "deno lint",
