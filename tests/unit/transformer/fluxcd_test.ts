@@ -7,7 +7,7 @@ Deno.test("FluxCDTransformer - direct field mapping", () => {
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "message", target_field: "message" },
+      { field_expression: "message", target_field: "message" },
     ],
   };
 
@@ -22,7 +22,7 @@ Deno.test("FluxCDTransformer - nested field mapping", () => {
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "involvedObject.name", target_field: "subtitle" },
+      { field_expression: "involvedObject.name", target_field: "subtitle" },
     ],
   };
 
@@ -37,7 +37,7 @@ Deno.test("FluxCDTransformer - template interpolation", () => {
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
+      { field_expression: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
     ],
   };
 
@@ -52,7 +52,7 @@ Deno.test("FluxCDTransformer - template with multiple fields", () => {
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "{{reportingController}} - {{involvedObject.kind}}", target_field: "title" },
+      { field_expression: "{{reportingController}} - {{involvedObject.kind}}", target_field: "title" },
     ],
   };
 
@@ -70,8 +70,8 @@ Deno.test("FluxCDTransformer - default values when missing - template has static
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "message", target_field: "message" },
-      { source_path: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
+      { field_expression: "message", target_field: "message" },
+      { field_expression: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
     ],
     default_values: {
       title: "FluxCD - Unknown",
@@ -91,7 +91,7 @@ Deno.test("FluxCDTransformer - default values NOT used when field exists", () =>
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
+      { field_expression: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
     ],
     default_values: {
       title: "FluxCD - Unknown",
@@ -109,9 +109,9 @@ Deno.test("FluxCDTransformer - multiple mappings", () => {
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "message", target_field: "message" },
-      { source_path: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
-      { source_path: "involvedObject.name", target_field: "subtitle" },
+      { field_expression: "message", target_field: "message" },
+      { field_expression: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
+      { field_expression: "involvedObject.name", target_field: "subtitle" },
     ],
   };
 
@@ -131,7 +131,7 @@ Deno.test("FluxCDTransformer - empty template value becomes empty string", () =>
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "FluxCD - {{missing.field}}", target_field: "title" },
+      { field_expression: "FluxCD - {{missing.field}}", target_field: "title" },
     ],
   };
 
@@ -146,7 +146,7 @@ Deno.test("FluxCDTransformer - missing nested field returns undefined", () => {
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "involvedObject.name", target_field: "subtitle" },
+      { field_expression: "involvedObject.name", target_field: "subtitle" },
     ],
   };
 
@@ -161,7 +161,7 @@ Deno.test("FluxCDTransformer - null value skipped, can use default", () => {
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "message", target_field: "message" },
+      { field_expression: "message", target_field: "message" },
     ],
     default_values: {
       message: "Default message",
@@ -180,7 +180,7 @@ Deno.test("FluxCDTransformer - number converted to string", () => {
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "count", target_field: "message" },
+      { field_expression: "count", target_field: "message" },
     ],
   };
 
@@ -195,7 +195,7 @@ Deno.test("FluxCDTransformer - boolean converted to string", () => {
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "active", target_field: "message" },
+      { field_expression: "active", target_field: "message" },
     ],
   };
 
@@ -210,7 +210,7 @@ Deno.test("FluxCDTransformer - empty payload", () => {
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "message", target_field: "message" },
+      { field_expression: "message", target_field: "message" },
     ],
     default_values: {
       message: "Default message",
@@ -228,7 +228,7 @@ Deno.test("FluxCDTransformer - deep nested path", () => {
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "metadata.labels.app", target_field: "message" },
+      { field_expression: "metadata.labels.app", target_field: "message" },
     ],
   };
 
@@ -249,7 +249,7 @@ Deno.test("FluxCDTransformer - deep nested path with missing intermediate", () =
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "metadata.labels.app", target_field: "message" },
+      { field_expression: "metadata.labels.app", target_field: "message" },
     ],
   };
 
@@ -277,9 +277,9 @@ Deno.test("FluxCDTransformer - full real-world payload", () => {
   
   const mapping: MappingConfig = {
     brrr_fields: [
-      { source_path: "message", target_field: "message" },
-      { source_path: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
-      { source_path: "involvedObject.name", target_field: "subtitle" },
+      { field_expression: "message", target_field: "message" },
+      { field_expression: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
+      { field_expression: "involvedObject.name", target_field: "subtitle" },
     ],
     default_values: {
       title: "FluxCD - Unknown",

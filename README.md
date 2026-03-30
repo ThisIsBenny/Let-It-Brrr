@@ -31,9 +31,9 @@ Create a `mappings.yaml` file:
 mappings:
   my-fluxcd-alerts:
     brrr_fields:
-      - source_path: "message"
+      - field_expression: "message"
         target_field: "message"
-      - source_path: "involvedObject.name"
+      - field_expression: "involvedObject.name"
         target_field: "subtitle"
     default_values:
       title: "FluxCD Alert"
@@ -96,12 +96,12 @@ The `mappings.yaml` file defines how webhook payloads are transformed:
 mappings:
   <mapping-id>:
     brrr_fields:
-      - source_path: "json.path.to.field"    # JSON path in incoming webhook
-        target_field: "target_field_name"      # Static field name for Brrr API
-      - source_path: "json.path.to.field"      # JSON path in incoming webhook
-        target_field: "prefix - {{otherField}}" # Template with {{}} embedding
+      - field_expression: "json.path.to.field"    # JSON path or template in incoming webhook
+        target_field: "target_field_name"           # Field name for Brrr API
+      - field_expression: "prefix - {{otherField}}"  # Template with {{}} embedding
+        target_field: "target_field_name"           # Result field name for Brrr API
     default_values:
-      <field_name>: <default_value>           # Fallback if source field is missing
+      <field_name>: <default_value>                 # Fallback if field_expression result is empty
 ```
 
 **Template Syntax:** Use `{{jsonPath}}` within `target_field` to embed dynamic values from the webhook payload.
@@ -117,11 +117,11 @@ target_field: "prefix - {{involvedObject.name}}"
 mappings:
   fluxcd-generic:
     brrr_fields:
-      - source_path: "message"
+      - field_expression: "message"
         target_field: "message"
-      - source_path: "FluxCD - {{involvedObject.kind}}"
+      - field_expression: "FluxCD - {{involvedObject.kind}}"
         target_field: "title"
-      - source_path: "involvedObject.name"
+      - field_expression: "involvedObject.name"
         target_field: "subtitle"
 ```
 

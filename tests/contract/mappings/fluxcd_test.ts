@@ -7,7 +7,7 @@ Deno.test("Contract - YAML mapping schema is valid", () => {
 mappings:
   fluxcd-generic:
     brrr_fields:
-      - source_path: "message"
+      - field_expression: "message"
         target_field: "message"
     default_values:
       title: "FluxCD - Unknown"
@@ -24,7 +24,7 @@ Deno.test("Contract - brrr_fields must be array", () => {
 mappings:
   test:
     brrr_fields:
-      - source_path: "a"
+      - field_expression: "a"
         target_field: "b"
 `;
   
@@ -39,18 +39,18 @@ Deno.test("Contract - each field mapping requires source_path and target_field",
 mappings:
   test:
     brrr_fields:
-      - source_path: "message"
+      - field_expression: "message"
         target_field: "message"
-      - source_path: "FluxCD - {{involvedObject.kind}}"
+      - field_expression: "FluxCD - {{involvedObject.kind}}"
         target_field: "title"
 `;
   
   const config = parse(yamlContent) as MappingsConfig;
   const mapping = config.mappings["test"] as MappingConfig;
   
-  assertEquals(mapping.brrr_fields[0].source_path, "message");
+  assertEquals(mapping.brrr_fields[0].field_expression, "message");
   assertEquals(mapping.brrr_fields[0].target_field, "message");
-  assertEquals(mapping.brrr_fields[1].source_path, "FluxCD - {{involvedObject.kind}}");
+  assertEquals(mapping.brrr_fields[1].field_expression, "FluxCD - {{involvedObject.kind}}");
   assertEquals(mapping.brrr_fields[1].target_field, "title");
 });
 
@@ -59,7 +59,7 @@ Deno.test("Contract - default_values is optional", () => {
 mappings:
   test:
     brrr_fields:
-      - source_path: "message"
+      - field_expression: "message"
         target_field: "message"
 `;
   
@@ -74,7 +74,7 @@ Deno.test("Contract - default_values can be defined", () => {
 mappings:
   test:
     brrr_fields:
-      - source_path: "message"
+      - field_expression: "message"
         target_field: "message"
     default_values:
       title: "Default Title"
@@ -93,11 +93,11 @@ Deno.test("Contract - multiple mappings supported", () => {
 mappings:
   fluxcd-generic:
     brrr_fields:
-      - source_path: "message"
+      - field_expression: "message"
         target_field: "message"
   github:
     brrr_fields:
-      - source_path: "body"
+      - field_expression: "body"
         target_field: "message"
 `;
   
@@ -112,7 +112,7 @@ Deno.test("Contract - template syntax in source_path", () => {
 mappings:
   test:
     brrr_fields:
-      - source_path: "{{prefix}} - {{kind}}"
+      - field_expression: "{{prefix}} - {{kind}}"
         target_field: "title"
 `;
   
@@ -120,8 +120,8 @@ mappings:
   const mapping = config.mappings["test"] as MappingConfig;
   
   const field = mapping.brrr_fields[0];
-  assertEquals(field.source_path.includes("{{prefix}}"), true);
-  assertEquals(field.source_path.includes("{{kind}}"), true);
+  assertEquals(field.field_expression.includes("{{prefix}}"), true);
+  assertEquals(field.field_expression.includes("{{kind}}"), true);
 });
 
 Deno.test("Contract - nested path in source_path", () => {
@@ -129,14 +129,14 @@ Deno.test("Contract - nested path in source_path", () => {
 mappings:
   test:
     brrr_fields:
-      - source_path: "metadata.labels.app"
+      - field_expression: "metadata.labels.app"
         target_field: "message"
 `;
   
   const config = parse(yamlContent) as MappingsConfig;
   const mapping = config.mappings["test"] as MappingConfig;
   
-  assertEquals(mapping.brrr_fields[0].source_path, "metadata.labels.app");
+  assertEquals(mapping.brrr_fields[0].field_expression, "metadata.labels.app");
 });
 
 Deno.test("Contract - Brrr fields are mapped to valid targets", () => {
@@ -149,11 +149,11 @@ Deno.test("Contract - Brrr fields are mapped to valid targets", () => {
 mappings:
   test:
     brrr_fields:
-      - source_path: "a"
+      - field_expression: "a"
         target_field: "title"
-      - source_path: "b"
+      - field_expression: "b"
         target_field: "message"
-      - source_path: "c"
+      - field_expression: "c"
         target_field: "subtitle"
 `;
   

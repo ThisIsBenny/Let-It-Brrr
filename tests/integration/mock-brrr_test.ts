@@ -27,7 +27,7 @@ Deno.test("Integration - Config loader returns correct count", async () => {
   const loader = new ConfigLoader("config/mappings.example.yaml");
   await loader.load();
   
-  assertEquals(loader.getMappingsCount(), 1);
+  assertEquals(loader.getMappingsCount(), 2);
 });
 
 Deno.test("Integration - Unknown mapping returns undefined", async () => {

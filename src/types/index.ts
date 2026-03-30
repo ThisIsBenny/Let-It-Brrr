@@ -1,5 +1,5 @@
 export interface BrrrFieldMapping {
-  source_path: string;
+  field_expression: string;
   target_field: string;
 }
 

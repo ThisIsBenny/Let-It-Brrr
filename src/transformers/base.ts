@@ -42,11 +42,11 @@ export abstract class BaseTransformer implements Transformer {
     const result: BrrrPayload = {};
 
     for (const fieldMapping of mapping.brrr_fields) {
-      const { source_path, target_field } = fieldMapping;
+      const { field_expression, target_field } = fieldMapping;
       
       // Check if it's a template (contains {{...}})
-      if (source_path.includes("{{") && source_path.includes("}}")) {
-        const value = this.interpolateTemplate(source_path, sourcePayload);
+      if (field_expression.includes("{{") && field_expression.includes("}}")) {
+        const value = this.interpolateTemplate(field_expression, sourcePayload);
         // Only use template if it has actual substituted content
         // "FluxCD - " (static text only) is treated as empty
         const hasContent = value.replace(/^[\s-]+/, "").length > 0;
@@ -55,7 +55,7 @@ export abstract class BaseTransformer implements Transformer {
         }
       } else {
         // Direct field mapping
-        const value = this.getValueByPath(sourcePayload, source_path);
+        const value = this.getValueByPath(sourcePayload, field_expression);
         // Handle null, undefined, and empty string
         if (value === null || value === undefined) {
           continue; // Skip, let default_values handle it
