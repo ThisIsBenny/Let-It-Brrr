@@ -164,6 +164,38 @@ Receive and transform webhooks.
 - `404` - Mapping not found
 - `502` - Brrr API error
 
+## Security
+
+### No Built-in Authentication
+
+**Important**: Let-It-Brrr does not have built-in authentication. The service is designed to be deployed behind network protection layers and should never be exposed directly to the internet without additional security measures.
+
+### Protection Recommendations
+
+To safely deploy Let-It-Brrr, use one or more of the following protection mechanisms:
+
+- **Network Restrictions**: Deploy behind a firewall or VPN to limit access to trusted networks only
+- **Reverse Proxy with Authentication**: Place a reverse proxy (such as nginx, Traefik, or Cloudflare Tunnel) in front of Let-It-Brrr that handles authentication
+- **IP Allowlisting**: Configure firewall rules to only allow incoming webhooks from known IP addresses
+
+### Mapping ID Security
+
+Mapping IDs (the `<mapping-id>` in webhook URLs) act as a minimal form of security through obscurity. **Use randomly generated, unpredictable mapping IDs** (e.g., UUIDs) rather than descriptive names like `my-fluxcd-alerts`.
+
+**Example of a secure mapping ID:**
+
+```yaml
+mappings:
+  a7f3b2c1-9e45-4d8f-b123-456789abcdef:
+    brrr_fields:
+      - field_expression: "message"
+        target_field: "message"
+    default_values:
+      title: "Alert"
+```
+
+**Do NOT use predictable mapping IDs** that could be guessed by unauthorized parties.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues or pull requests.
