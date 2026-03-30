@@ -43,7 +43,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: stable
+          deno-version: 2.7.9
 
       - name: Run lint
         run: deno lint
@@ -58,7 +58,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: stable
+          deno-version: 2.7.9
 
       - name: Run tests
         run: deno test --allow-read --allow-net=api.brrr.now,127.0.0.1 --allow-env=LOG_LEVEL,PORT,BRRR_SECRET,BRRR_WEBHOOK_URL,MAPPINGS_FILE
