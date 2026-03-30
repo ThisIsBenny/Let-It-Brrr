@@ -85,7 +85,7 @@ ghcr.io/thisisbenny/let-it-brrr
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `BRRR_SECRET` | Yes | - | Secret for Brrr API authentication |
-| `MAPPINGS_FILE` | Yes | `/app/config/mappings.yaml` | Path to mappings configuration |
+| `MAPPINGS_FILE` | No | `/app/config/mappings.yaml` | Path to mappings configuration |
 | `LOG_LEVEL` | No | `INFO` | Logging level (DEBUG, INFO, WARN, ERROR) |
 
 ### Mappings Configuration
