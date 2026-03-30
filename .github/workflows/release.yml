@@ -119,5 +119,5 @@ jobs:
         run: |
           gh release create ${{ steps.tag.outputs.tag }} \
             --title "Release ${{ steps.tag.outputs.tag }}" \
-            --generate-release-notes \
+            --generate-notes \
             --target main
