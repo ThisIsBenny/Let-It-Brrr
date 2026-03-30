@@ -1,6 +1,14 @@
 # Logs
 logs
 *.log
+
+# Config (contains secrets)
+config/mappings.yaml
+
+# Keep example config
+!config/mappings.example.yaml
+
+# Environment
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

@@ -1,0 +1,11 @@
+mappings:
+  fluxcd-generic:
+    brrr_fields:
+      - source_path: "message"
+        target_field: "message"
+      - source_path: "FluxCD - {{involvedObject.kind}}"
+        target_field: "title"
+      - source_path: "involvedObject.name"
+        target_field: "subtitle"
+    default_values:
+      title: "FluxCD"
