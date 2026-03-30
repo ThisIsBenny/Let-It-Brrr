@@ -19,17 +19,17 @@ export class MockBrrrApiClient implements IBrrrApiClient {
     this.failureMessage = failureMessage;
   }
 
-  async post(payload: BrrrPayload): Promise<BrrrResponse> {
+  post(payload: BrrrPayload): Promise<BrrrResponse> {
     this.lastPayload = payload;
 
     if (this.shouldFail) {
-      throw new Error(this.failureMessage);
+      return Promise.reject(new Error(this.failureMessage));
     }
 
-    return {
+    return Promise.resolve({
       success: true,
       id: `mock-${Date.now()}`,
-    };
+    });
   }
 
   getLastPayload(): BrrrPayload | null {
