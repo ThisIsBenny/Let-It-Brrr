@@ -26,6 +26,7 @@ function createMockContext(body: unknown, method = "POST"): Context {
       method,
       header: (name: string) =>
         name === "Content-Type" ? "application/json" : null,
+      // deno-lint-ignore require-await
       json: async () => body,
     },
     json: (data: unknown) => new Response(JSON.stringify(data)),
@@ -100,6 +101,7 @@ Deno.test("handleWebhook - rejects non-JSON content type", async () => {
     req: {
       method: "POST",
       header: () => null,
+      // deno-lint-ignore require-await
       json: async () => {
         throw new Error("Should not be called");
       },
