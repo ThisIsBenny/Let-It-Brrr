@@ -4,16 +4,22 @@
 [![Release](https://img.shields.io/github/v/release/ThisIsBenny/Let-It-Brrr?include_prereleases&label=Latest)](https://github.com/ThisIsBenny/Let-It-Brrr/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A webhook middleware that transforms any payloads to work with the [Brrr](https://brrr.now) API.
+A webhook middleware that transforms any payloads to work with the
+[Brrr](https://brrr.now) API.
 
 ## Overview
 
-Let-It-Brrr receives webhooks from various sources, transforms their payloads using customizable mappings, and forwards them to the Brrr notification API. This allows you to integrate any webhook source with Brrr without modifying your existing systems.
+Let-It-Brrr receives webhooks from various sources, transforms their payloads
+using customizable mappings, and forwards them to the Brrr notification API.
+This allows you to integrate any webhook source with Brrr without modifying your
+existing systems.
 
 ## Features
 
-- **Customizable Payload Mapping**: Define how incoming payloads should be transformed to match Brrr's expected format.
-- **Default Values**: Set default values for fields that may not be present in the incoming payload.
+- **Customizable Payload Mapping**: Define how incoming payloads should be
+  transformed to match Brrr's expected format.
+- **Default Values**: Set default values for fields that may not be present in
+  the incoming payload.
 
 ## Quick Start
 
@@ -68,9 +74,9 @@ ghcr.io/thisisbenny/let-it-brrr
 
 ### Tags
 
-| Tag | Description |
-|-----|-------------|
-| `latest` | Most recent release |
+| Tag      | Description                                |
+| -------- | ------------------------------------------ |
+| `latest` | Most recent release                        |
 | `v*.*.*` | Specific semantic version (e.g., `v0.1.0`) |
 
 ### Architectures
@@ -82,11 +88,11 @@ ghcr.io/thisisbenny/let-it-brrr
 
 ### Environment Variables
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `BRRR_SECRET` | Yes | - | Secret for Brrr API authentication |
-| `MAPPINGS_FILE` | No | `/app/config/mappings.yaml` | Path to mappings configuration |
-| `LOG_LEVEL` | No | `INFO` | Logging level (DEBUG, INFO, WARN, ERROR) |
+| Variable        | Required | Default                     | Description                              |
+| --------------- | -------- | --------------------------- | ---------------------------------------- |
+| `BRRR_SECRET`   | Yes      | -                           | Secret for Brrr API authentication       |
+| `MAPPINGS_FILE` | No       | `/app/config/mappings.yaml` | Path to mappings configuration           |
+| `LOG_LEVEL`     | No       | `INFO`                      | Logging level (DEBUG, INFO, WARN, ERROR) |
 
 ### Mappings Configuration
 
@@ -96,15 +102,16 @@ The `mappings.yaml` file defines how webhook payloads are transformed:
 mappings:
   <mapping-id>:
     brrr_fields:
-      - field_expression: "json.path.to.field"    # JSON path or template in incoming webhook
-        target_field: "target_field_name"           # Field name for Brrr API
-      - field_expression: "prefix - {{otherField}}"  # Template with {{}} embedding
-        target_field: "target_field_name"           # Result field name for Brrr API
+      - field_expression: "json.path.to.field" # JSON path or template in incoming webhook
+        target_field: "target_field_name" # Field name for Brrr API
+      - field_expression: "prefix - {{otherField}}" # Template with {{}} embedding
+        target_field: "target_field_name" # Result field name for Brrr API
     default_values:
-      <field_name>: <default_value>                 # Fallback if field_expression result is empty
+      <field_name>: <default_value> # Fallback if field_expression result is empty
 ```
 
-**Template Syntax:** Use `{{jsonPath}}` within `target_field` to embed dynamic values from the webhook payload.
+**Template Syntax:** Use `{{jsonPath}}` within `target_field` to embed dynamic
+values from the webhook payload.
 
 ```yaml
 target_field: "prefix - {{involvedObject.name}}"
@@ -134,11 +141,13 @@ mappings:
 Health check endpoint.
 
 **Response:**
+
 ```json
 { "status": "ok", "mappings_count": 2, "version": "1.0.0" }
 ```
 
 **Fields:**
+
 - `status` - Always "ok" when healthy
 - `mappings_count` - Number of configured mappings
 - `version` - Application version (from git tag or "0.0.0" if not available)
@@ -148,18 +157,22 @@ Health check endpoint.
 Receive and transform webhooks.
 
 **Path Parameters:**
+
 - `mappingId` - The mapping configuration to use
 
 **Request:**
+
 - `Content-Type: application/json`
 - Body: Webhook payload
 
 **Response:**
+
 ```json
 { "status": "forwarded", "mapping_id": "my-mapping" }
 ```
 
 **Error Responses:**
+
 - `400` - Invalid JSON or missing Content-Type
 - `404` - Mapping not found
 - `502` - Brrr API error
@@ -168,19 +181,28 @@ Receive and transform webhooks.
 
 ### No Built-in Authentication
 
-**Important**: Let-It-Brrr does not have built-in authentication. The service is designed to be deployed behind network protection layers and should never be exposed directly to the internet without additional security measures.
+**Important**: Let-It-Brrr does not have built-in authentication. The service is
+designed to be deployed behind network protection layers and should never be
+exposed directly to the internet without additional security measures.
 
 ### Protection Recommendations
 
-To safely deploy Let-It-Brrr, use one or more of the following protection mechanisms:
+To safely deploy Let-It-Brrr, use one or more of the following protection
+mechanisms:
 
-- **Network Restrictions**: Deploy behind a firewall or VPN to limit access to trusted networks only
-- **Reverse Proxy with Authentication**: Place a reverse proxy (such as nginx, Traefik, or Cloudflare Tunnel) in front of Let-It-Brrr that handles authentication
-- **IP Allowlisting**: Configure firewall rules to only allow incoming webhooks from known IP addresses
+- **Network Restrictions**: Deploy behind a firewall or VPN to limit access to
+  trusted networks only
+- **Reverse Proxy with Authentication**: Place a reverse proxy (such as nginx,
+  Traefik, or Cloudflare Tunnel) in front of Let-It-Brrr that handles
+  authentication
+- **IP Allowlisting**: Configure firewall rules to only allow incoming webhooks
+  from known IP addresses
 
 ### Mapping ID Security
 
-Mapping IDs (the `<mapping-id>` in webhook URLs) act as a minimal form of security through obscurity. **Use randomly generated, unpredictable mapping IDs** (e.g., UUIDs) rather than descriptive names like `my-fluxcd-alerts`.
+Mapping IDs (the `<mapping-id>` in webhook URLs) act as a minimal form of
+security through obscurity. **Use randomly generated, unpredictable mapping
+IDs** (e.g., UUIDs) rather than descriptive names like `my-fluxcd-alerts`.
 
 **Example of a secure mapping ID:**
 
@@ -194,7 +216,8 @@ mappings:
       title: "Alert"
 ```
 
-**Do NOT use predictable mapping IDs** that could be guessed by unauthorized parties.
+**Do NOT use predictable mapping IDs** that could be guessed by unauthorized
+parties.
 
 ## Contributing
 
@@ -222,4 +245,5 @@ deno lint
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
+for details.

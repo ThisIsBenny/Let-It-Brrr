@@ -1,6 +1,9 @@
 import { assertEquals, assertExists } from "@std/assert";
 import { parse } from "@std/yaml";
-import type { MappingsConfig, MappingConfig } from "../../../src/types/index.ts";
+import type {
+  MappingConfig,
+  MappingsConfig,
+} from "../../../src/types/index.ts";
 
 Deno.test("Contract - YAML mapping schema is valid", () => {
   const yamlContent = `
@@ -12,9 +15,9 @@ mappings:
     default_values:
       title: "Default Title"
 `;
-  
+
   const config = parse(yamlContent) as MappingsConfig;
-  
+
   assertExists(config.mappings);
   assertExists(config.mappings["test-mapping-1"]);
 });
@@ -27,10 +30,10 @@ mappings:
       - field_expression: "a"
         target_field: "b"
 `;
-  
+
   const config = parse(yamlContent) as MappingsConfig;
   const mapping = config.mappings["test-mapping-1"] as MappingConfig;
-  
+
   assertEquals(Array.isArray(mapping.brrr_fields), true);
 });
 
@@ -44,13 +47,16 @@ mappings:
       - field_expression: "{{prefix}} - {{kind}}"
         target_field: "title"
 `;
-  
+
   const config = parse(yamlContent) as MappingsConfig;
   const mapping = config.mappings["test-mapping-1"] as MappingConfig;
-  
+
   assertEquals(mapping.brrr_fields[0].field_expression, "message");
   assertEquals(mapping.brrr_fields[0].target_field, "message");
-  assertEquals(mapping.brrr_fields[1].field_expression, "{{prefix}} - {{kind}}");
+  assertEquals(
+    mapping.brrr_fields[1].field_expression,
+    "{{prefix}} - {{kind}}",
+  );
   assertEquals(mapping.brrr_fields[1].target_field, "title");
 });
 
@@ -62,10 +68,10 @@ mappings:
       - field_expression: "message"
         target_field: "message"
 `;
-  
+
   const config = parse(yamlContent) as MappingsConfig;
   const mapping = config.mappings["test-mapping-1"] as MappingConfig;
-  
+
   assertEquals(mapping.default_values, undefined);
 });
 
@@ -80,10 +86,10 @@ mappings:
       title: "Default Title"
       message: "Default Message"
 `;
-  
+
   const config = parse(yamlContent) as MappingsConfig;
   const mapping = config.mappings["test-mapping-1"] as MappingConfig;
-  
+
   assertEquals(mapping.default_values?.title, "Default Title");
   assertEquals(mapping.default_values?.message, "Default Message");
 });
@@ -100,9 +106,9 @@ mappings:
       - field_expression: "body"
         target_field: "message"
 `;
-  
+
   const config = parse(yamlContent) as MappingsConfig;
-  
+
   assertExists(config.mappings["test-mapping-1"]);
   assertExists(config.mappings["test-mapping-2"]);
 });
@@ -115,10 +121,10 @@ mappings:
       - field_expression: "{{prefix}} - {{kind}}"
         target_field: "title"
 `;
-  
+
   const config = parse(yamlContent) as MappingsConfig;
   const mapping = config.mappings["test-mapping-1"] as MappingConfig;
-  
+
   const field = mapping.brrr_fields[0];
   assertEquals(field.field_expression.includes("{{prefix}}"), true);
   assertEquals(field.field_expression.includes("{{kind}}"), true);
@@ -132,19 +138,27 @@ mappings:
       - field_expression: "metadata.labels.app"
         target_field: "message"
 `;
-  
+
   const config = parse(yamlContent) as MappingsConfig;
   const mapping = config.mappings["test-mapping-1"] as MappingConfig;
-  
+
   assertEquals(mapping.brrr_fields[0].field_expression, "metadata.labels.app");
 });
 
 Deno.test("Contract - Brrr fields are mapped to valid targets", () => {
   const validBrrrFields = [
-    "title", "subtitle", "message", "thread_id", "sound", 
-    "open_url", "image_url", "expiration_date", "filter_criteria", "interruption_level"
+    "title",
+    "subtitle",
+    "message",
+    "thread_id",
+    "sound",
+    "open_url",
+    "image_url",
+    "expiration_date",
+    "filter_criteria",
+    "interruption_level",
   ];
-  
+
   const yamlContent = `
 mappings:
   test-mapping-1:
@@ -156,12 +170,16 @@ mappings:
       - field_expression: "c"
         target_field: "subtitle"
 `;
-  
+
   const config = parse(yamlContent) as MappingsConfig;
   const mapping = config.mappings["test-mapping-1"] as MappingConfig;
-  
+
   for (const field of mapping.brrr_fields) {
-    assertEquals(validBrrrFields.includes(field.target_field), true, `Invalid field: ${field.target_field}`);
+    assertEquals(
+      validBrrrFields.includes(field.target_field),
+      true,
+      `Invalid field: ${field.target_field}`,
+    );
   }
 });
 
@@ -171,10 +189,10 @@ mappings:
   test-mapping-1:
     brrr_fields: []
 `;
-  
+
   const config = parse(yamlContent) as MappingsConfig;
   const mapping = config.mappings["test-mapping-1"] as MappingConfig;
-  
+
   assertEquals(mapping.brrr_fields.length, 0);
 });
 
@@ -192,10 +210,10 @@ mappings:
     default_values:
       title: "FluxCD"
 `;
-  
+
   const config = parse(yamlContent) as MappingsConfig;
   const mapping = config.mappings["fluxcd-generic"] as MappingConfig;
-  
+
   assertEquals(mapping.brrr_fields.length, 3);
   assertEquals(mapping.default_values?.title, "FluxCD");
 });
@@ -212,10 +230,10 @@ mappings:
     default_values:
       title: "Beszel"
 `;
-  
+
   const config = parse(yamlContent) as MappingsConfig;
   const mapping = config.mappings["beszel"] as MappingConfig;
-  
+
   assertEquals(mapping.brrr_fields.length, 2);
   assertEquals(mapping.default_values?.title, "Beszel");
 });
@@ -232,10 +250,10 @@ mappings:
     default_values:
       title: "Uptime Kuma"
 `;
-  
+
   const config = parse(yamlContent) as MappingsConfig;
   const mapping = config.mappings["uptimekuma"] as MappingConfig;
-  
+
   assertEquals(mapping.brrr_fields.length, 2);
   assertEquals(mapping.default_values?.title, "Uptime Kuma");
 });
@@ -252,10 +270,10 @@ mappings:
     default_values:
       title: "Proxmox"
 `;
-  
+
   const config = parse(yamlContent) as MappingsConfig;
   const mapping = config.mappings["proxmox"] as MappingConfig;
-  
+
   assertEquals(mapping.brrr_fields.length, 2);
   assertEquals(mapping.default_values?.title, "Proxmox");
 });

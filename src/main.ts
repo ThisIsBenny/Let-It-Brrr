@@ -1,4 +1,3 @@
-import "jsr:@std/dotenv@^0.225.6";
 import { Hono } from "@hono/hono";
 import type { Context } from "@hono/hono";
 import { handleWebhook } from "./handlers/webhook.ts";
@@ -16,8 +15,8 @@ app.post("/webhook/:mappingId", (c: Context) => {
   return handleWebhook(c, mappingId);
 });
 
-app.notFound((c: Context) => {
-  return c.json({ error: "Not found", path: c.req.path }, 404);
+app.notFound((_c: Context) => {
+  throw new HTTPException(404, { message: "Not found" });
 });
 
 app.onError((err, c) => {

@@ -1,5 +1,8 @@
 import type { BrrrPayload } from "../../src/types/index.ts";
-import type { IBrrrApiClient, BrrrResponse } from "../../src/services/brrr-api-client.ts";
+import type {
+  BrrrResponse,
+  IBrrrApiClient,
+} from "../../src/services/brrr-api-client.ts";
 
 export class MockBrrrApiClient implements IBrrrApiClient {
   private shouldFail = false;

@@ -76,7 +76,14 @@ export class Logger {
     }
   }
 
-  logRequest(requestId: string, mappingName: string, _payload: unknown, status: string, durationMs?: number, error?: string): void {
+  logRequest(
+    requestId: string,
+    mappingName: string,
+    _payload: unknown,
+    status: string,
+    durationMs?: number,
+    error?: string,
+  ): void {
     this.info("HTTP request processed", {
       request_id: requestId,
       mapping_name: mappingName,

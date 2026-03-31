@@ -23,20 +23,32 @@ export function validateBrrrPayload(
   const sanitizedPayload: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(payload)) {
-    if (!config.allowedBrrrFields.includes(key as typeof config.allowedBrrrFields[number])) {
+    if (
+      !config.allowedBrrrFields.includes(
+        key as typeof config.allowedBrrrFields[number],
+      )
+    ) {
       warnings.push(`Invalid field: ${key}`);
       continue;
     }
 
     if (key === "sound") {
-      if (!config.allowedSounds.includes(value as typeof config.allowedSounds[number])) {
+      if (
+        !config.allowedSounds.includes(
+          value as typeof config.allowedSounds[number],
+        )
+      ) {
         warnings.push(`Invalid field: sound`);
         continue;
       }
     }
 
     if (key === "interruption_level") {
-      if (!config.allowedInterruptionLevels.includes(value as typeof config.allowedInterruptionLevels[number])) {
+      if (
+        !config.allowedInterruptionLevels.includes(
+          value as typeof config.allowedInterruptionLevels[number],
+        )
+      ) {
         warnings.push(`Invalid field: interruption_level`);
         continue;
       }

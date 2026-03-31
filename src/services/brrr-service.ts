@@ -1,4 +1,4 @@
-import type { BrrrPayload, MappingConfig } from "../types/index.ts";
+import type { BrrrPayload } from "../types/index.ts";
 import type { IBrrrApiClient } from "./brrr-api-client.ts";
 import { BrrrApiClient } from "./brrr-api-client.ts";
 import { BrrrApiError, SSRFError } from "../errors/index.ts";
@@ -27,7 +27,6 @@ export class BrrrService {
 
   private constructor(
     private apiClient: IBrrrApiClient,
-    private webhookUrl: string
   ) {}
 
   static reset(): void {
@@ -37,7 +36,7 @@ export class BrrrService {
   static get(
     url: string,
     secret?: string,
-    apiClient?: IBrrrApiClient
+    apiClient?: IBrrrApiClient,
   ): BrrrService {
     if (BrrrService.instance) {
       return BrrrService.instance;
@@ -55,7 +54,7 @@ export class BrrrService {
       client = new BrrrApiClient(secret, url);
     }
 
-    const service = new BrrrService(client, url);
+    const service = new BrrrService(client);
     BrrrService.instance = service;
     return service;
   }
@@ -67,7 +66,9 @@ export class BrrrService {
         throw new SSRFError("SSRF protection: Only HTTPS URLs are allowed");
       }
       if (isPrivateUrl(parsedUrl)) {
-        throw new SSRFError("SSRF protection: Private/internal URLs are not allowed");
+        throw new SSRFError(
+          "SSRF protection: Private/internal URLs are not allowed",
+        );
       }
     } catch (e) {
       if (e instanceof SSRFError) {
@@ -81,22 +82,25 @@ export class BrrrService {
   }
 
   async sendNotification(
-    _mapping: MappingConfig,
-    payload: BrrrPayload
+    payload: BrrrPayload,
   ): Promise<void> {
-    const validationResult = validateBrrrPayload(payload as Record<string, unknown>);
+    const validationResult = validateBrrrPayload(
+      payload as Record<string, unknown>,
+    );
 
     for (const warning of validationResult.warnings) {
       logger.warn(warning);
     }
 
-    this.validateUrl(new URL(this.webhookUrl));
-
     const startTime = Date.now();
-    logger.debug("Sending to Brrr", { payload: validationResult.sanitizedPayload });
+    logger.debug("Sending to Brrr", {
+      payload: validationResult.sanitizedPayload,
+    });
 
     try {
-      await this.apiClient.post(validationResult.sanitizedPayload as BrrrPayload);
+      await this.apiClient.post(
+        validationResult.sanitizedPayload as BrrrPayload,
+      );
 
       const duration = Date.now() - startTime;
       logger.info("Notification sent successfully", {
@@ -105,26 +109,16 @@ export class BrrrService {
       });
     } catch (error) {
       const duration = Date.now() - startTime;
-      if (error instanceof SSRFError) {
-        throw error;
-      }
       logger.error("Failed to send notification", {
         status: "error",
         duration_ms: duration,
         error: error instanceof Error ? error.message : String(error),
       });
       throw new BrrrApiError(
-        `Failed to send notification: ${error instanceof Error ? error.message : String(error)}`
+        `Failed to send notification: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
       );
-    }
-  }
-
-  private validateUrl(url: URL): void {
-    if (url.protocol !== "https:") {
-      throw new SSRFError("SSRF protection: Only HTTPS URLs are allowed");
-    }
-    if (isPrivateUrl(url)) {
-      throw new SSRFError("SSRF protection: Private/internal URLs are not allowed");
     }
   }
 }

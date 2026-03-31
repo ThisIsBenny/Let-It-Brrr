@@ -34,18 +34,7 @@ export interface BrrrPayload {
   image_url?: string;
   expiration_date?: string;
   filter_criteria?: string;
-  interruption_level?: string;
-}
-
-export interface FluxCDEvent {
-  message?: string;
-  reason?: string;
-  severity?: string;
-  involvedObject?: {
-    kind?: string;
-    name?: string;
-  };
-  reportingController?: string;
+  interruption_level?: "active" | "passive" | "time-sensitive";
 }
 
 export interface HealthResponse {

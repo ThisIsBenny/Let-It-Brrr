@@ -31,7 +31,10 @@ Deno.test("BaseTransformer - nested field mapping", () => {
 Deno.test("BaseTransformer - template interpolation", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
-      { field_expression: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
+      {
+        field_expression: "FluxCD - {{involvedObject.kind}}",
+        target_field: "title",
+      },
     ],
   };
 
@@ -44,13 +47,16 @@ Deno.test("BaseTransformer - template interpolation", () => {
 Deno.test("BaseTransformer - template with multiple fields", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
-      { field_expression: "{{reportingController}} - {{involvedObject.kind}}", target_field: "title" },
+      {
+        field_expression: "{{reportingController}} - {{involvedObject.kind}}",
+        target_field: "title",
+      },
     ],
   };
 
-  const payload = { 
+  const payload = {
     reportingController: "deployment-controller",
-    involvedObject: { kind: "Deployment" }
+    involvedObject: { kind: "Deployment" },
   };
   const result = baseTransformer.transform(payload, mapping);
 
@@ -61,7 +67,10 @@ Deno.test("BaseTransformer - default values when missing - template has static p
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "message", target_field: "message" },
-      { field_expression: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
+      {
+        field_expression: "FluxCD - {{involvedObject.kind}}",
+        target_field: "title",
+      },
     ],
     default_values: {
       title: "FluxCD - Unknown",
@@ -78,7 +87,10 @@ Deno.test("BaseTransformer - default values when missing - template has static p
 Deno.test("BaseTransformer - default values NOT used when field exists", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
-      { field_expression: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
+      {
+        field_expression: "FluxCD - {{involvedObject.kind}}",
+        target_field: "title",
+      },
     ],
     default_values: {
       title: "FluxCD - Unknown",
@@ -95,14 +107,17 @@ Deno.test("BaseTransformer - multiple mappings", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "message", target_field: "message" },
-      { field_expression: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
+      {
+        field_expression: "FluxCD - {{involvedObject.kind}}",
+        target_field: "title",
+      },
       { field_expression: "involvedObject.name", target_field: "subtitle" },
     ],
   };
 
-  const payload = { 
+  const payload = {
     message: "Deployment failed",
-    involvedObject: { kind: "Deployment", name: "my-app" }
+    involvedObject: { kind: "Deployment", name: "my-app" },
   };
   const result = baseTransformer.transform(payload, mapping);
 
@@ -202,12 +217,12 @@ Deno.test("BaseTransformer - deep nested path", () => {
     ],
   };
 
-  const payload = { 
-    metadata: { 
-      labels: { 
-        app: "my-app" 
-      } 
-    } 
+  const payload = {
+    metadata: {
+      labels: {
+        app: "my-app",
+      },
+    },
   };
   const result = baseTransformer.transform(payload, mapping);
 
@@ -231,7 +246,10 @@ Deno.test("BaseTransformer - full real-world payload", () => {
   const mapping: MappingConfig = {
     brrr_fields: [
       { field_expression: "message", target_field: "message" },
-      { field_expression: "FluxCD - {{involvedObject.kind}}", target_field: "title" },
+      {
+        field_expression: "FluxCD - {{involvedObject.kind}}",
+        target_field: "title",
+      },
       { field_expression: "involvedObject.name", target_field: "subtitle" },
     ],
     default_values: {
@@ -245,9 +263,9 @@ Deno.test("BaseTransformer - full real-world payload", () => {
     severity: "error",
     involvedObject: {
       kind: "Kustomization",
-      name: "my-app"
+      name: "my-app",
     },
-    reportingController: "kustomize-controller"
+    reportingController: "kustomize-controller",
   };
 
   const result = baseTransformer.transform(payload, mapping);

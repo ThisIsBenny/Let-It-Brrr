@@ -43,7 +43,11 @@ const ALLOWED_SOUNDS = [
   "warm_soft_error",
 ] as const;
 
-const ALLOWED_INTERRUPTION_LEVELS = ["active", "passive", "time-sensitive"] as const;
+const ALLOWED_INTERRUPTION_LEVELS = [
+  "active",
+  "passive",
+  "time-sensitive",
+] as const;
 
 const ALLOWED_BRRR_FIELDS = [
   "title",
@@ -63,7 +67,8 @@ export const config = {
   logLevel: Deno.env.get("LOG_LEVEL") || "info",
   mappingsFile: Deno.env.get("MAPPINGS_FILE") || "./config/mappings.yaml",
   brrrSecret: Deno.env.get("BRRR_SECRET") || "",
-  brrrWebhookUrl: Deno.env.get("BRRR_WEBHOOK_URL") || "https://api.brrr.now/v1/",
+  brrrWebhookUrl: Deno.env.get("BRRR_WEBHOOK_URL") ||
+    "https://api.brrr.now/v1/",
   privateIpPatterns: PRIVATE_IP_PATTERNS,
   blockedHostnames: BLOCKED_HOSTNAMES,
   blockedIpv6Hostnames: BLOCKED_IPV6_HOSTNAMES,

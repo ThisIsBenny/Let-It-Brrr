@@ -1,4 +1,4 @@
-import { assertEquals, assertArrayIncludes } from "@std/assert";
+import { assertArrayIncludes, assertEquals } from "@std/assert";
 import { validateBrrrPayload } from "../../../src/validators/brrr.ts";
 
 Deno.test("Validator - accepts valid payload", () => {
@@ -86,8 +86,15 @@ Deno.test("Validator - accepts all valid interruption_level values", () => {
   const validLevels = ["active", "passive", "time-sensitive"];
 
   for (const level of validLevels) {
-    const result = validateBrrrPayload({ message: "Test", interruption_level: level });
-    assertEquals(result.valid, true, `Interruption level "${level}" should be valid`);
+    const result = validateBrrrPayload({
+      message: "Test",
+      interruption_level: level,
+    });
+    assertEquals(
+      result.valid,
+      true,
+      `Interruption level "${level}" should be valid`,
+    );
   }
 });
 
@@ -100,7 +107,10 @@ Deno.test("Validator - rejects invalid ISO 8601 date formats", () => {
   ];
 
   for (const date of invalidDates) {
-    const result = validateBrrrPayload({ message: "Test", expiration_date: date });
+    const result = validateBrrrPayload({
+      message: "Test",
+      expiration_date: date,
+    });
     assertEquals(result.valid, false, `Date "${date}" should be invalid`);
     assertArrayIncludes(result.warnings, ["Invalid field: expiration_date"]);
   }
@@ -127,7 +137,10 @@ Deno.test("Validator - accepts future expiration dates", () => {
   const result = validateBrrrPayload(payload);
 
   assertEquals(result.valid, true);
-  assertEquals(result.sanitizedPayload.expiration_date, "2030-12-31T23:59:59.000Z");
+  assertEquals(
+    result.sanitizedPayload.expiration_date,
+    "2030-12-31T23:59:59.000Z",
+  );
 });
 
 Deno.test("Validator - handles multiple invalid fields", () => {

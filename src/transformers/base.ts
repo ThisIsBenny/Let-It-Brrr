@@ -1,4 +1,8 @@
-import type { BrrrPayload, MappingConfig, TransformationResult } from "../types/index.ts";
+import type {
+  BrrrPayload,
+  MappingConfig,
+  TransformationResult,
+} from "../types/index.ts";
 
 export interface Transformer {
   transform(payload: unknown, mapping: MappingConfig): TransformationResult;
@@ -42,7 +46,7 @@ export class BaseTransformer implements Transformer {
 
   protected buildBrrrPayload(
     sourcePayload: unknown,
-    mapping: MappingConfig
+    mapping: MappingConfig,
   ): BrrrPayload {
     const result: BrrrPayload = {};
 
@@ -60,7 +64,9 @@ export class BaseTransformer implements Transformer {
         if (value === null || value === undefined) {
           continue;
         }
-        const processedValue = typeof value === "string" ? value : String(value);
+        const processedValue = typeof value === "string"
+          ? value
+          : String(value);
 
         if (processedValue) {
           (result as Record<string, unknown>)[target_field] = processedValue;
@@ -69,7 +75,9 @@ export class BaseTransformer implements Transformer {
     }
 
     if (mapping.default_values) {
-      for (const [field, defaultValue] of Object.entries(mapping.default_values)) {
+      for (
+        const [field, defaultValue] of Object.entries(mapping.default_values)
+      ) {
         if (!(result as Record<string, unknown>)[field]) {
           (result as Record<string, unknown>)[field] = defaultValue;
         }

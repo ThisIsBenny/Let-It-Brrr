@@ -36,7 +36,7 @@ export async function handleWebhook(c: Context, mappingId: string) {
   const brrrService = BrrrService.get(config.brrrWebhookUrl, config.brrrSecret);
   const transformation = baseTransformer.transform(body, mapping);
 
-  await brrrService.sendNotification(mapping, transformation.payload);
+  await brrrService.sendNotification(transformation.payload);
 
   const duration = Date.now() - startTime;
   logger.logRequest(requestId, mappingId, body, "success", duration);

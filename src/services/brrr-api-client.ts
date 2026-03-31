@@ -12,7 +12,7 @@ export interface IBrrrApiClient {
 export class BrrrApiClient implements IBrrrApiClient {
   constructor(
     private secret: string,
-    private webhookUrl: string
+    private webhookUrl: string,
   ) {}
 
   async post(payload: BrrrPayload): Promise<BrrrResponse> {

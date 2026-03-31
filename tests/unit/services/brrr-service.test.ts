@@ -1,4 +1,9 @@
-import { assertEquals, assertExists, assertRejects, assertThrows } from "@std/assert";
+import {
+  assertEquals,
+  assertExists,
+  assertRejects,
+  assertThrows,
+} from "@std/assert";
 import { BrrrService } from "../../../src/services/brrr-service.ts";
 import { MockBrrrApiClient } from "../../mocks/mock-brrr-api-client.ts";
 import { baseTransformer } from "../../../src/transformers/base.ts";
@@ -9,24 +14,20 @@ Deno.test.beforeEach(() => {
   BrrrService.reset();
 });
 
-const mockMapping: MappingConfig = {
-  brrr_fields: [
-    { field_expression: "message", target_field: "message" },
-    { field_expression: "involvedObject.kind", target_field: "title" },
-    { field_expression: "involvedObject.name", target_field: "subtitle" },
-  ],
-};
-
 Deno.test("sendNotification - success with valid payload", async () => {
   const mockClient = MockBrrrApiClient.success();
-  const service = BrrrService.get("https://api.brrr.now/v1/", "secret", mockClient);
+  const service = BrrrService.get(
+    "https://api.brrr.now/v1/",
+    "secret",
+    mockClient,
+  );
 
   const payload = {
     title: "Test",
     message: "Hello world",
   };
 
-  await service.sendNotification(mockMapping, payload);
+  await service.sendNotification(payload);
 
   const sentPayload = mockClient.getLastPayload();
   assertExists(sentPayload);
@@ -36,7 +37,11 @@ Deno.test("sendNotification - success with valid payload", async () => {
 
 Deno.test("sendNotification - failure when API returns error", async () => {
   const mockClient = MockBrrrApiClient.failure("API is down");
-  const service = BrrrService.get("https://api.brrr.now/v1/", "secret", mockClient);
+  const service = BrrrService.get(
+    "https://api.brrr.now/v1/",
+    "secret",
+    mockClient,
+  );
 
   const payload = {
     title: "Test",
@@ -44,27 +49,34 @@ Deno.test("sendNotification - failure when API returns error", async () => {
   };
 
   await assertRejects(
-    () => service.sendNotification(mockMapping, payload),
+    () => service.sendNotification(payload),
     Error,
-    "Failed to send notification: API is down"
+    "Failed to send notification: API is down",
   );
 });
 
 Deno.test("sendNotification - strips unknown fields", async () => {
   const mockClient = MockBrrrApiClient.success();
-  const service = BrrrService.get("https://api.brrr.now/v1/", "secret", mockClient);
+  const service = BrrrService.get(
+    "https://api.brrr.now/v1/",
+    "secret",
+    mockClient,
+  );
 
   const payload = {
     title: "Test",
     message: "Hello world",
     unknownField: "should be stripped",
-  } as unknown as Parameters<typeof service.sendNotification>[1];
+  } as unknown as Parameters<typeof service.sendNotification>[0];
 
-  await service.sendNotification(mockMapping, payload);
+  await service.sendNotification(payload);
 
   const sentPayload = mockClient.getLastPayload();
   assertExists(sentPayload);
-  assertEquals((sentPayload as Record<string, unknown>).unknownField, undefined);
+  assertEquals(
+    (sentPayload as Record<string, unknown>).unknownField,
+    undefined,
+  );
 });
 
 Deno.test("sendNotification - uses transformed payload with defaults", async () => {
@@ -78,15 +90,22 @@ Deno.test("sendNotification - uses transformed payload with defaults", async () 
   };
 
   const mockClient = MockBrrrApiClient.success();
-  const service = BrrrService.get("https://api.brrr.now/v1/", "secret", mockClient);
+  const service = BrrrService.get(
+    "https://api.brrr.now/v1/",
+    "secret",
+    mockClient,
+  );
 
   const rawPayload = {
     message: "Hello",
   };
 
-  const transformed = baseTransformer.transform(rawPayload, mappingWithDefaults);
+  const transformed = baseTransformer.transform(
+    rawPayload,
+    mappingWithDefaults,
+  );
 
-  await service.sendNotification(mappingWithDefaults, transformed.payload);
+  await service.sendNotification(transformed.payload);
 
   const sentPayload = mockClient.getLastPayload();
   assertExists(sentPayload);
@@ -104,15 +123,22 @@ Deno.test("sendNotification - unmapped fields use default values", async () => {
   };
 
   const mockClient = MockBrrrApiClient.success();
-  const service = BrrrService.get("https://api.brrr.now/v1/", "secret", mockClient);
+  const service = BrrrService.get(
+    "https://api.brrr.now/v1/",
+    "secret",
+    mockClient,
+  );
 
   const rawPayload = {
     message: "Hello",
   };
 
-  const transformed = baseTransformer.transform(rawPayload, mappingWithDefaults);
+  const transformed = baseTransformer.transform(
+    rawPayload,
+    mappingWithDefaults,
+  );
 
-  await service.sendNotification(mappingWithDefaults, transformed.payload);
+  await service.sendNotification(transformed.payload);
 
   const sentPayload = mockClient.getLastPayload();
   assertExists(sentPayload);
@@ -121,8 +147,16 @@ Deno.test("sendNotification - unmapped fields use default values", async () => {
 
 Deno.test("get - returns singleton instance", () => {
   const mockClient = MockBrrrApiClient.success();
-  const service1 = BrrrService.get("https://api.brrr.now/v1/", "secret", mockClient);
-  const service2 = BrrrService.get("https://api.brrr.now/v1/", "secret", mockClient);
+  const service1 = BrrrService.get(
+    "https://api.brrr.now/v1/",
+    "secret",
+    mockClient,
+  );
+  const service2 = BrrrService.get(
+    "https://api.brrr.now/v1/",
+    "secret",
+    mockClient,
+  );
 
   assertEquals(service1, service2);
 });
@@ -131,6 +165,6 @@ Deno.test("get - without secret and without apiClient throws", () => {
   assertThrows(
     () => BrrrService.get("https://api.brrr.now/v1/"),
     BrrrApiError,
-    "BRRR_SECRET environment variable is required"
+    "BRRR_SECRET environment variable is required",
   );
 });

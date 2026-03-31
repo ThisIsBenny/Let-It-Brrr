@@ -1,19 +1,20 @@
 import { parse } from "@std/yaml";
-import type { MappingsConfig, MappingConfig } from "../types/index.ts";
+import type { MappingConfig, MappingsConfig } from "../types/index.ts";
 
 export class ConfigLoader {
   private mappings: Map<string, MappingConfig> = new Map();
   private configPath: string;
 
   constructor(configPath?: string) {
-    this.configPath = configPath || Deno.env.get("MAPPINGS_FILE") || "./config/mappings.yaml";
+    this.configPath = configPath || Deno.env.get("MAPPINGS_FILE") ||
+      "./config/mappings.yaml";
   }
 
   async load(): Promise<void> {
     try {
       const content = await Deno.readTextFile(this.configPath);
       const config = parse(content) as MappingsConfig;
-      
+
       if (!config.mappings) {
         throw new Error("Invalid config: 'mappings' key not found");
       }
@@ -44,7 +45,9 @@ export class ConfigLoader {
 
 let globalLoader: ConfigLoader | null = null;
 
-export async function getConfigLoader(configPath?: string): Promise<ConfigLoader> {
+export async function getConfigLoader(
+  configPath?: string,
+): Promise<ConfigLoader> {
   if (!globalLoader) {
     globalLoader = new ConfigLoader(configPath);
     await globalLoader.load();
