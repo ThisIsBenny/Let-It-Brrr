@@ -32,7 +32,6 @@ jobs:
             echo "Expected format: vMAJOR.MINOR.PATCH (e.g., v1.0.0)"
             exit 1
           fi
-
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -44,9 +43,13 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: 2.7.9
+          cache: true
 
       - name: Run lint
         run: deno lint
+
+      - name: Run fmt check
+        run: deno fmt --check
 
   test:
     name: Test
@@ -59,9 +62,13 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: 2.7.9
+          cache: true
+
+      - name: Copy mappings file
+        run: cp config/mappings.example.yaml config/mappings.yaml
 
       - name: Run tests
-        run: deno test --allow-read --allow-net=api.brrr.now,127.0.0.1 --allow-env=LOG_LEVEL,PORT,BRRR_SECRET,BRRR_WEBHOOK_URL,MAPPINGS_FILE
+        run: deno test --coverage --allow-read --allow-net=api.brrr.now,127.0.0.1 --allow-env=LOG_LEVEL,PORT,BRRR_SECRET,BRRR_WEBHOOK_URL,MAPPINGS_FILE
 
   build-and-publish:
     name: Build and Publish
