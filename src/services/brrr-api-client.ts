@@ -16,10 +16,12 @@ export class BrrrApiClient implements IBrrrApiClient {
   ) {}
 
   async post(payload: BrrrPayload): Promise<BrrrResponse> {
-    const fullUrl = `${this.webhookUrl}${this.secret}`;
-    const response = await fetch(fullUrl, {
+    const response = await fetch(this.webhookUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.secret}`,
+      },
       body: JSON.stringify(payload),
     });
 

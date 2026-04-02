@@ -10,7 +10,7 @@ let mockClient: MockBrrrApiClient;
 Deno.test.beforeAll(() => {
   mockClient = MockBrrrApiClient.success();
   BrrrService.get(
-    "https://api.brrr.now/v1/",
+    "https://api.brrr.now/v1/send",
     "test-secret",
     mockClient,
   );

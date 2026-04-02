@@ -124,6 +124,6 @@ Deno.test("SSRF protection - blocks current network (0.x)", () => {
 });
 
 Deno.test("SSRF protection - allows valid HTTPS URLs", () => {
-  const service = BrrrService.get("https://api.brrr.now/v1/", "secret");
+  const service = BrrrService.get("https://api.brrr.now/v1/send", "secret");
   assertEquals(service !== null, true);
 });

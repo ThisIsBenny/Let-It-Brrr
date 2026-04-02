@@ -17,7 +17,7 @@ Deno.test.beforeEach(() => {
 Deno.test("sendNotification - success with valid payload", async () => {
   const mockClient = MockBrrrApiClient.success();
   const service = BrrrService.get(
-    "https://api.brrr.now/v1/",
+    "https://api.brrr.now/v1/send",
     "secret",
     mockClient,
   );
@@ -38,7 +38,7 @@ Deno.test("sendNotification - success with valid payload", async () => {
 Deno.test("sendNotification - failure when API returns error", async () => {
   const mockClient = MockBrrrApiClient.failure("API is down");
   const service = BrrrService.get(
-    "https://api.brrr.now/v1/",
+    "https://api.brrr.now/v1/send",
     "secret",
     mockClient,
   );
@@ -58,7 +58,7 @@ Deno.test("sendNotification - failure when API returns error", async () => {
 Deno.test("sendNotification - strips unknown fields", async () => {
   const mockClient = MockBrrrApiClient.success();
   const service = BrrrService.get(
-    "https://api.brrr.now/v1/",
+    "https://api.brrr.now/v1/send",
     "secret",
     mockClient,
   );
@@ -91,7 +91,7 @@ Deno.test("sendNotification - uses transformed payload with defaults", async () 
 
   const mockClient = MockBrrrApiClient.success();
   const service = BrrrService.get(
-    "https://api.brrr.now/v1/",
+    "https://api.brrr.now/v1/send",
     "secret",
     mockClient,
   );
@@ -124,7 +124,7 @@ Deno.test("sendNotification - unmapped fields use default values", async () => {
 
   const mockClient = MockBrrrApiClient.success();
   const service = BrrrService.get(
-    "https://api.brrr.now/v1/",
+    "https://api.brrr.now/v1/send",
     "secret",
     mockClient,
   );
@@ -148,12 +148,12 @@ Deno.test("sendNotification - unmapped fields use default values", async () => {
 Deno.test("get - returns singleton instance", () => {
   const mockClient = MockBrrrApiClient.success();
   const service1 = BrrrService.get(
-    "https://api.brrr.now/v1/",
+    "https://api.brrr.now/v1/send",
     "secret",
     mockClient,
   );
   const service2 = BrrrService.get(
-    "https://api.brrr.now/v1/",
+    "https://api.brrr.now/v1/send",
     "secret",
     mockClient,
   );
@@ -163,7 +163,7 @@ Deno.test("get - returns singleton instance", () => {
 
 Deno.test("get - without secret and without apiClient throws", () => {
   assertThrows(
-    () => BrrrService.get("https://api.brrr.now/v1/"),
+    () => BrrrService.get("https://api.brrr.now/v1/send"),
     BrrrApiError,
     "BRRR_SECRET environment variable is required",
   );

@@ -68,7 +68,7 @@ export const config = {
   mappingsFile: Deno.env.get("MAPPINGS_FILE") || "./config/mappings.yaml",
   brrrSecret: Deno.env.get("BRRR_SECRET") || "",
   brrrWebhookUrl: Deno.env.get("BRRR_WEBHOOK_URL") ||
-    "https://api.brrr.now/v1/",
+    "https://api.brrr.now/v1/send",
   privateIpPatterns: PRIVATE_IP_PATTERNS,
   blockedHostnames: BLOCKED_HOSTNAMES,
   blockedIpv6Hostnames: BLOCKED_IPV6_HOSTNAMES,
