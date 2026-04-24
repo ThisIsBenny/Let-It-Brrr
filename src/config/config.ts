@@ -47,6 +47,7 @@ const ALLOWED_INTERRUPTION_LEVELS = [
   "active",
   "passive",
   "time-sensitive",
+  "critical",
 ] as const;
 
 const ALLOWED_BRRR_FIELDS = [

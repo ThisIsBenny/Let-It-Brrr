@@ -34,7 +34,7 @@ export interface BrrrPayload {
   image_url?: string;
   expiration_date?: string;
   filter_criteria?: string;
-  interruption_level?: "active" | "passive" | "time-sensitive";
+  interruption_level?: "active" | "passive" | "time-sensitive" | "critical";
 }
 
 export interface HealthResponse {

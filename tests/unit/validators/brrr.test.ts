@@ -83,7 +83,7 @@ Deno.test("Validator - rejects invalid interruption_level values", () => {
 });
 
 Deno.test("Validator - accepts all valid interruption_level values", () => {
-  const validLevels = ["active", "passive", "time-sensitive"];
+  const validLevels = ["active", "passive", "time-sensitive", "critical"];
 
   for (const level of validLevels) {
     const result = validateBrrrPayload({
