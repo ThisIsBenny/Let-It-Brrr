@@ -20,13 +20,3 @@ export class SSRFError extends BrrrApiError {
     super(message, 400);
   }
 }
-
-export class ValidationError extends BrrrApiError {
-  constructor(message: string) {
-    super(message, 400);
-  }
-}
-
-export function isHTTPException(error: unknown): error is HTTPException {
-  return error instanceof HTTPException;
-}
