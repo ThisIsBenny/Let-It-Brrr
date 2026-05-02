@@ -44,20 +44,63 @@ export class BaseTransformer implements Transformer {
     });
   }
 
+  protected evaluateConditionalEntry(
+    entry: { target_field: string; when: { field: string; contains: string }; value: string },
+    sourcePayload: unknown,
+    matchedFields: Set<string>,
+    result: Record<string, unknown>,
+  ): void {
+    const { target_field, when, value } = entry;
+
+    if (matchedFields.has(target_field)) return;
+
+    const resolvedValue = this.getValueByPath(sourcePayload, when.field);
+    if (resolvedValue === undefined || resolvedValue === null) return;
+
+    const strValue = typeof resolvedValue === "string"
+      ? resolvedValue
+      : String(resolvedValue);
+
+    // Case-insensitive substring match
+    if (strValue.toLowerCase().includes(when.contains.toLowerCase())) {
+      result[target_field] = value;
+      matchedFields.add(target_field);
+    }
+  }
+
   protected buildBrrrPayload(
     sourcePayload: unknown,
     mapping: MappingConfig,
   ): BrrrPayload {
-    const result: BrrrPayload = {};
+    const result = {} as Record<string, unknown>;
+    const matchedFields = new Set<string>();
 
     for (const fieldMapping of mapping.brrr_fields) {
+      const hasWhenAndValue = fieldMapping.when && fieldMapping.value;
+
+      if (hasWhenAndValue) {
+        this.evaluateConditionalEntry(
+          fieldMapping as {
+            target_field: string;
+            when: { field: string; contains: string };
+            value: string;
+          },
+          sourcePayload,
+          matchedFields,
+          result,
+        );
+        continue;
+      }
+
+      if (!fieldMapping.field_expression) continue;
+
       const { field_expression, target_field } = fieldMapping;
 
       if (field_expression.includes("{{") && field_expression.includes("}}")) {
         const value = this.interpolateTemplate(field_expression, sourcePayload);
         const hasContent = value.replace(/^[\s-]+/, "").length > 0;
         if (hasContent) {
-          (result as Record<string, unknown>)[target_field] = value;
+          result[target_field] = value;
         }
       } else {
         const value = this.getValueByPath(sourcePayload, field_expression);
@@ -69,7 +112,7 @@ export class BaseTransformer implements Transformer {
           : String(value);
 
         if (processedValue) {
-          (result as Record<string, unknown>)[target_field] = processedValue;
+          result[target_field] = processedValue;
         }
       }
     }
@@ -78,13 +121,13 @@ export class BaseTransformer implements Transformer {
       for (
         const [field, defaultValue] of Object.entries(mapping.default_values)
       ) {
-        if (!(result as Record<string, unknown>)[field]) {
-          (result as Record<string, unknown>)[field] = defaultValue;
+        if (!result[field]) {
+          result[field] = defaultValue;
         }
       }
     }
 
-    return result;
+    return result as BrrrPayload;
   }
 }
 

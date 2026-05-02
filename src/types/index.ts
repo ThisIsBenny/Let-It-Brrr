@@ -1,6 +1,13 @@
+export interface WhenCondition {
+  field: string;
+  contains: string;
+}
+
 export interface BrrrFieldMapping {
-  field_expression: string;
+  field_expression?: string;
   target_field: string;
+  when?: WhenCondition;
+  value?: string;
 }
 
 export interface DefaultValues {

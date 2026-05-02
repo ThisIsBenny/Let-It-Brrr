@@ -18,6 +18,9 @@ existing systems.
 
 - **Customizable Payload Mapping**: Define how incoming payloads should be
   transformed to match Brrr's expected format.
+- **Conditional Value Assignment**: Dynamically assign field values based on
+  webhook payload content (e.g., set interruption level to `critical` when the
+  message contains "urgent").
 - **Default Values**: Set default values for fields that may not be present in
   the incoming payload.
 
@@ -118,7 +121,29 @@ target_field: "prefix - {{involvedObject.name}}"
 # Result if involvedObject.name = "my-app": "prefix - my-app"
 ```
 
-#### Example: FluxCD
+#### Conditional Value Assignment
+
+You can dynamically assign values to fields based on webhook payload content
+using the `when` condition:
+
+```yaml
+- target_field: "<target_field_name>"
+  when:
+    field: "json.path.to.field"   # Dot-path into source payload
+    contains: "substring"          # Case-insensitive substring to match
+  value: "<static_value>"          # Value to assign when condition matches
+```
+
+**How it works:**
+- The `when.field` path is resolved against the incoming payload (supports
+  dot-notation for nested fields)
+- If the resolved value contains `when.contains` (case-insensitive), the
+  `value` is assigned to `target_field`
+- Multiple rules for the same `target_field` use **first-match-wins** (rules are
+  evaluated in order, first matching rule wins)
+- `default_values` serves as fallback when no rule matches
+
+#### Example: FluxCD with Dynamic Interruption Levels
 
 ```yaml
 mappings:
@@ -130,6 +155,24 @@ mappings:
         target_field: "title"
       - field_expression: "involvedObject.name"
         target_field: "subtitle"
+      - target_field: "interruption_level"
+        when:
+          field: "message"
+          contains: "critical"
+        value: "critical"
+      - target_field: "interruption_level"
+        when:
+          field: "message"
+          contains: "error"
+        value: "time-sensitive"
+      - target_field: "interruption_level"
+        when:
+          field: "involvedObject.kind"
+          contains: "Kustomization"
+        value: "time-sensitive"
+    default_values:
+      title: "FluxCD"
+      interruption_level: "active"    # fallback when no condition matches
 ```
 
 ## API

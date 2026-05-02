@@ -126,8 +126,8 @@ mappings:
   const mapping = config.mappings["test-mapping-1"] as MappingConfig;
 
   const field = mapping.brrr_fields[0];
-  assertEquals(field.field_expression.includes("{{prefix}}"), true);
-  assertEquals(field.field_expression.includes("{{kind}}"), true);
+  assertEquals(field.field_expression!.includes("{{prefix}}"), true);
+  assertEquals(field.field_expression!.includes("{{kind}}"), true);
 });
 
 Deno.test("Contract - nested path in field_expression", () => {
