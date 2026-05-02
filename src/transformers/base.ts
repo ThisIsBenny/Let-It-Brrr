@@ -45,7 +45,11 @@ export class BaseTransformer implements Transformer {
   }
 
   protected evaluateConditionalEntry(
-    entry: { target_field: string; when: { field: string; contains: string }; value: string },
+    entry: {
+      target_field: string;
+      when: { field: string; contains: string };
+      value: string;
+    },
     sourcePayload: unknown,
     matchedFields: Set<string>,
     result: Record<string, unknown>,

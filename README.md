@@ -129,16 +129,17 @@ using the `when` condition:
 ```yaml
 - target_field: "<target_field_name>"
   when:
-    field: "json.path.to.field"   # Dot-path into source payload
-    contains: "substring"          # Case-insensitive substring to match
-  value: "<static_value>"          # Value to assign when condition matches
+    field: "json.path.to.field" # Dot-path into source payload
+    contains: "substring" # Case-insensitive substring to match
+  value: "<static_value>" # Value to assign when condition matches
 ```
 
 **How it works:**
+
 - The `when.field` path is resolved against the incoming payload (supports
   dot-notation for nested fields)
-- If the resolved value contains `when.contains` (case-insensitive), the
-  `value` is assigned to `target_field`
+- If the resolved value contains `when.contains` (case-insensitive), the `value`
+  is assigned to `target_field`
 - Multiple rules for the same `target_field` use **first-match-wins** (rules are
   evaluated in order, first matching rule wins)
 - `default_values` serves as fallback when no rule matches
@@ -172,7 +173,7 @@ mappings:
         value: "time-sensitive"
     default_values:
       title: "FluxCD"
-      interruption_level: "active"    # fallback when no condition matches
+      interruption_level: "active" # fallback when no condition matches
 ```
 
 ## API
